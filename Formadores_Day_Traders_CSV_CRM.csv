@@ -1,0 +1,11 @@
+﻿Cliente;Empresa;Email;Telefone;Produto;Quantidade;Preço;Data
+Cliente A;Particular;cliente.a@example.com;910000001;Day Trading Nivel 1;1;250.00;15/07/2025
+Cliente B;Particular;cliente.b@example.com;910000002;Day Trading Nivel 2;1;325.00;18/07/2025
+Cliente C;Particular;cliente.c@example.com;910000003;Day Trading Nivel 2;1;325.00;20/07/2025
+Cliente D;Particular;cliente.d@example.com;910000004;Day Trading Nivel 1;1;250.00;22/07/2025
+Empresa Alfa;Empresa Alfa;contacto.alfa@example.com;910000005;Day Trading Nivel 1;5;250.00;25/07/2025
+EmpresaBeta;Empresa Beta;contacto.beta@example.com;910000006;Day Trading Nivel 1;7;250.00;07/07/2026
+Empresa Gama;Empresa Gama;contacto.gama@example.com;910000007;Day Trading Nivel 2;3;325.00;02/09/2026
+Empresa Delta;Empresa Delta;contacto.delta@example.com;910000008;Day Trading Nivel 1;4;250.00;07/05/2025
+Cliente E;Particular;cliente.e@example.com;910000009;Day Trading Nivel 3;1;395.00;07/04/2026
+Cliente F;Particular;cliente.f@example.com;910000010;Day Trading Nivel 3;1;395.00;07/04/2026

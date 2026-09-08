@@ -9,7 +9,7 @@ from crm_tss import mostrar_crm
 def open_file():
 
     # upload do ficheiro
-    file = st.file_uploader("Escolher ficheiro", type="csv")
+    file = st.file_uploader("Selecione um ficheiro CSV para analizar dados de vendas e gerar relatório em HTML", type="csv")
     if file is not None:
         st.success("Ficheiro carregado.")
 
@@ -29,8 +29,6 @@ def open_file():
 
         # gera o grafico utilizando os totais por produto
         graphics(dict_metrics["totais_produto"])
-
-        print(dict_metrics)
 
 
 # ---- logo da empresa ----

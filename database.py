@@ -54,6 +54,22 @@ def update_clients_db(client_id, nome, empresa, email, telefone, faturacao_total
         con.commit()
 
 
+# esta def permite devolver o registo completo do cliente atraves do seu email do CSV e adiciona-o no CRM
+def fetch_client_by_email(email):
+    with sqlite3.connect("tss_crm.db") as con:
+        cursor = con.cursor()
+        cursor.execute("SELECT * FROM clients WHERE email = ?", (email,))
+        return cursor.fetchone()
+
+
+# atualiza a faturacao total do cliente no crm atraves e-mail(aqui adicionamos apenas a faturacao no crm a um cliente ja existente)
+def update_faturacao_cliente(email, faturacao_total):
+    with sqlite3.connect("tss_crm.db") as con:
+        cursor = con.cursor()
+        cursor.execute("UPDATE clients set faturacao_total = ? WHERE email = ?", (faturacao_total, email))
+        con.commit()
+
+
 def filter_clients_db(nome="", empresa="", email=""):
     with sqlite3.connect("tss_crm.db") as con:
         cursor = con.cursor()

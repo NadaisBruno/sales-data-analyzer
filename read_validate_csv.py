@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import re
 
 
 def validate_csv(file):
@@ -20,10 +21,10 @@ def validate_csv(file):
         return None
 
     # verificamos se o CSV contem as colunas obrigatorias
-    colunas_obrigatorias = ["Cliente", "Produto", "Quantidade", "Preço", "Data"]
+    colunas_obrigatorias = ["Cliente", "Empresa", "Email", "Telefone", "Produto", "Quantidade", "Preço", "Data"]
     for coluna in colunas_obrigatorias:
         if coluna not in df.columns:
-            st.error("Erro - O ficheiro deve conter as colunas: Cliente, Produto, Quantidade, Preço e Data")
+            st.error("Erro - O ficheiro deve conter as colunas: Cliente, Empresa, Email, Telefone, Produto, Quantidade, Preço e Data")
             return None
 
     # data -----
@@ -77,6 +78,46 @@ def validate_csv(file):
     if (df["Cliente"].str.strip() == "").any():
         st.error("Erro - A coluna 'Cliente' contem valores vazios ou apenas espaços em branco")
         return None
+
+    # Empresa ----
+    if df["Empresa"].isna().any():
+        st.error("Erro - A coluna 'Empresa' contem valores em falta. Preencha todas as celulas antes de continuar")
+        return None
+
+    if (df["Empresa"].str.strip() == "").any():
+        st.error("Erro - A coluna 'Empresa' contem valores vazios ou apenas espaços em branco")
+        return None
+
+    # Email ----
+    if df["Email"].isna().any():
+        st.error("Erro - A coluna 'Email' contem valores em falta. Preencha todas as celulas antes de continuar")
+        return None
+
+    if (df["Email"].str.strip() == "").any():
+        st.error("Erro - A coluna 'Email' contem valores vazios ou apenas espaços em branco")
+        return None
+
+    for email in df["Email"]:
+        if "@" not in email or "." not in email:
+            st.error("O campo 'Email' deve conter '@' e '.' ")
+            return None
+
+    # Telefone ----
+    if df["Telefone"].isna().any():
+        st.error("Erro - A coluna 'Telefone' contem valores em falta. Preencha todas as celulas antes de continuar")
+        return None
+
+    # essencial para nao dar erro: converte os valores desta coluna para texto antes das validacoes string
+    df["Telefone"] = df["Telefone"].astype(str)
+
+    if (df["Telefone"].str.strip() == "").any():
+        st.error("Erro - A coluna 'Telefone' contem valores vazios ou apenas espaços em branco")
+        return None
+
+    for telefone in df["Telefone"]:
+        if not re.fullmatch(r"\+?[0-9]+", telefone):
+            st.error("O campo 'telefone' só deve conter digitos e, opcionalmente, '+' no ínicio")
+            return None
 
     print(df.shape)
 

@@ -12,6 +12,9 @@ from database import remove_leads_db
 from database import update_leads_db
 from database import list_leads_db
 from database import filter_leads_db
+from database import fetch_client_by_email
+from database import update_faturacao_cliente
+from read_validate_csv import validate_csv
 
 
 # --------------------------- CLIENTES -------------------------------------------
@@ -138,6 +141,22 @@ def editar_clientes(client_id, nome_client, empresa_client, email_client, telefo
 def filtrar_clientes(filter_nome, filter_empresa, filter_email):
     resultados = filter_clients_db(filter_nome, filter_empresa, filter_email)
     return resultados
+
+
+# Percorre o CSV e cria novos clientes no CRM(com insert_clients_db) ou se o cliente existir no CRM, atualiza a faturacao dos clientes atraves do email
+def dados_cliente_faturacao_para_crm(df):
+    for i in range(len(df)):
+        nome = df["Cliente"][i]
+        empresa = df["Empresa"][i]
+        email = df["Email"][i]
+        telefone = df["Telefone"][i]
+        faturacao_total = df["Quantidade"][i] * df["Preço"][i]
+
+        resultado = fetch_client_by_email(email)
+        if resultado:
+            update_faturacao_cliente(email, faturacao_total)
+        else:
+            insert_clients_db(nome, empresa, email, telefone, faturacao_total)
 
 
 # -------------------------- LEADS -----------------------------------------
@@ -269,7 +288,6 @@ def filtrar_leads(filter_nome, filter_empresa, filter_email, filter_estado):
 
 
 def mostrar_crm():
-
     # ---- titulo Streamlit ----
     st.title("CRM Formadores Day Traders")
 
@@ -296,10 +314,34 @@ def mostrar_crm():
             #
             adicionar_clients(nome, empresa, email, telefone, faturacao_total)
 
+
+        # --------- importar clientes e faturação do CSV para serem adicionados ao formulario -----------
+
+        st.divider()
+
+        st.subheader("Importar clientes e faturação do CSV para o CRM")
+
+        # upload do ficheiro
+        file = st.file_uploader("Selecione um ficheiro CSV para importar novos clientes ou atualizar a faturação dos clientes já existentes", type="csv")
+        if file is not None:
+            st.success("Ficheiro carregado com sucesso")
+
+            # enviamos o ficheiro carregado para a funcao que valida o CSV
+            # e se o ficheiro for valido validate_csv() devolve um dataframe
+            df = validate_csv(file)
+
+            if df is None:
+                return
+
+            botao_importar = st.button("Importar cliente do CSV")
+            if botao_importar:
+                dados_cliente_faturacao_para_crm(df)
+
         # subtitulo para a tabela de clientes
         st.subheader("Lista de Clientes")
 
         st.caption("Selecione um cliente para editar ou remover.")
+
 
         # ---------------- remover clients -----------------------------
         # vamos buscar todos os clientes a base de dados
@@ -336,7 +378,7 @@ def mostrar_crm():
                 # ...chama a funcao de remocao de clientes
                 remover_clients(id_cliente)
 
-            # ------------------- atualizar clientes ------------------------
+            # ------------------- atualizar clients ------------------------
 
             atualizar_nome = cliente_selecionado[1]
             atualizar_empresa = cliente_selecionado[2]
@@ -355,14 +397,15 @@ def mostrar_crm():
             empresa = form_atualizar_clients.text_input("Empresa", value=atualizar_empresa)
             email = form_atualizar_clients.text_input("Email", value=atualizar_email)
             telefone = form_atualizar_clients.text_input("Telefone", value=atualizar_telefone)
-            faturacao_total = form_atualizar_clients.number_input("Faturação total", value=float(atualizar_faturacao_total),
+            faturacao_total = form_atualizar_clients.number_input("Faturação total",
+                                                                  value=float(atualizar_faturacao_total),
                                                                   min_value=float(0))
 
             botao_atualizar_clients = form_atualizar_clients.form_submit_button("Atualizar Cliente")
             if botao_atualizar_clients:
                 editar_clientes(id_cliente, nome, empresa, email, telefone, faturacao_total)
 
-        # ---------------- filtrar clientes -----------------------
+        # ---------------- filtrar clients -----------------------
 
         # Criamos um novo formulario para o processo de filtragem
         form_filtrar_clients = st.form("Filtrar Clientes")
@@ -467,7 +510,8 @@ def mostrar_crm():
             lead_email = form_atualizar_leads.text_input("Email", value=atualizar_lead_email)
             lead_telefone = form_atualizar_leads.text_input("Telefone", value=atualizar_lead_telefone)
             lead_servico = form_atualizar_leads.text_input("Serviço", value=atualizar_lead_servico)
-            lead_valor = form_atualizar_leads.number_input("Valor", value=float(atualizar_lead_valor), min_value=float(0))
+            lead_valor = form_atualizar_leads.number_input("Valor", value=float(atualizar_lead_valor),
+                                                           min_value=float(0))
             lead_estado = form_atualizar_leads.selectbox("Selecione uma opção",
                                                          ("Novo", "Contactado", "Proposta", "Ganho", "Perdido"),
                                                          index=indice_estados)
@@ -489,7 +533,8 @@ def mostrar_crm():
         filtro_nome_lead = form_filtrar_leads.text_input("Nome")
         filtro_empresa_lead = form_filtrar_leads.text_input("Empresa")
         filtro_email_lead = form_filtrar_leads.text_input("Email")
-        filtro_estado_lead = form_filtrar_leads.selectbox("Estado", ("", "Novo", "Contactado", "Proposta", "Ganho", "Perdido"))
+        filtro_estado_lead = form_filtrar_leads.selectbox("Estado",
+                                                          ("", "Novo", "Contactado", "Proposta", "Ganho", "Perdido"))
 
         # criamos o botao para filtrar as leads
         botao_filtrar_leads = form_filtrar_leads.form_submit_button("Filtrar Lead")
