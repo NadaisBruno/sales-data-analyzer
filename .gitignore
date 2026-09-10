@@ -17,3 +17,9 @@ __pycache__/
 
 # relatorio gerado automaticamente
 relatorio.html
+
+#
+build/
+dist/
+*.zip
+*.rar

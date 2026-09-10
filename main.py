@@ -1,4 +1,5 @@
 import streamlit as st
+import webbrowser
 from read_validate_csv import validate_csv
 from csv_metrics import metrics
 from html_report import relatorio_html
@@ -26,6 +27,9 @@ def open_file():
 
         # gera relatorio de HTML
         relatorio_html(dict_metrics)
+        # botao para abrir o relatorio no navegador
+        if st.button("Abrir relatório HTML"):
+            webbrowser.open("relatorio.html")
 
         # gera o grafico utilizando os totais por produto
         graphics(dict_metrics["totais_produto"])

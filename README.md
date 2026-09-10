@@ -14,6 +14,7 @@ Esta aplicação tambem inclui um mini CRM para gestão de clientes e leads/opor
     - Mini CRM contruído em Streamlit(UI) para gestão de: 
       - clientes(criação, atualização, remoção e filtragem de registos)  
       - leads/oportunidades(criação, atualização, remoção e filtragem de registos) 
+      - opção de adicionar novos clientes e faturação ao CRM diretamente do ficheiro CSV
 
 ## Como correr o programa
 
